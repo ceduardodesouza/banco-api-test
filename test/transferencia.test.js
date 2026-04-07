@@ -1,19 +1,14 @@
 const request = require ('supertest');
 const{expect} = require ('chai')
 require ('dotenv').config()
+const{obterToken}= require('../helpers/autenticacao')
 
 describe('transferencias', () => {
     describe('POST /transferencias', ()=> {
         it('deve retornar sucesso com 201 quando o valor da transferencia for igual ou acima de R$ 10,00', async() => {
-             const respostaLogin =  await request (process.env.BASE_URL)
-                .post('/login')   
-                .set('content-type' , 'application/json')
-                .send ({
-                                'username': 'julio.lima',
-                                'senha': '123456'
-                              })   
             
-            const token= respostaLogin.body.token
+            
+            const token= await obterToken('julio.lima' , '123456')
 
                               const resposta = await request (process.env.BASE_URL)
                 .post('/transferencias')
@@ -33,17 +28,9 @@ describe('transferencias', () => {
                 console.log(resposta.body)
         })
           it('deve retornar falha com 422 quando o valor da transferencia for abaixo de R$ 10,00', async() => {
-             const respostaLogin =  await request ('http://localhost:3000')
-                .post('/login')   
-                .set('content-type' , 'application/json')
-                .send ({
-                                'username': 'julio.lima',
-                                'senha': '123456'
-                              })   
-            
-            const token= respostaLogin.body.token
+           const token= await obterToken('julio.lima' , '123456')
 
-                              const resposta = await request ('http://localhost:3000')
+                              const resposta = await request (process.env.BASE_URL)
                 .post('/transferencias')
                 .set('content-type', 'application/json')
                 .set('Authorization', 'Bearer ' + token)
